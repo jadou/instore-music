@@ -1,0 +1,117 @@
+#!/bin/bash
+
+on_success="DONE"
+on_fail="FAIL"
+white="\e[1;37m"
+green="\e[1;32m"
+red="\e[1;31m"
+blue="\e[1;34m"
+nc="\e[0m"
+
+function _spinner() {
+    case $1 in
+        start)
+            let column=$(tput cols)-${#2}-8
+            echo -ne ${2}
+            printf "%${column}s"
+            i=1
+            sp='\|/-'
+            delay=${SPINNER_DELAY:-0.15}
+            while :
+            do
+                printf "\b${sp:i++%${#sp}:1}"
+                sleep $delay
+            done
+            ;;
+        stop)
+            if [[ -z ${3} ]]; then
+                #echo "spinner is not running.."
+                exit 1
+            fi
+            kill $3 > /dev/null 2>&1
+            echo -en "\b["
+            if [[ $2 -eq 0 ]]; then
+                echo -en "${green}${on_success}${nc}"
+            else
+                echo -en "${red}${on_fail}${nc}"
+            fi
+            echo -e "]"
+            ;;
+        *)
+            #echo "invalid argument, try {start/stop}"
+            exit 1
+            ;;
+    esac
+}
+
+function start_spinner {
+    _spinner "start" "${blue}${1}${nc}" &
+    _sp_pid=$!
+    disown
+}
+
+function stop_spinner {
+    _spinner "stop" $1 $_sp_pid
+    unset _sp_pid
+}
+
+function exitc {
+	stop_spinner $?
+    echo -en "\n${red}Exited${nc}\n"
+    exit;
+}
+
+trap exitc INT
+
+USERNAME=uop
+PASSWORD=uop
+
+start_spinner "Updating apt sources"
+sudo apt update > /dev/null 2>&1;
+stop_spinner $?
+start_spinner "Removing Raspberry Pi GUI"
+#sudo sed -i 's/autologin-user=pi/#autologin-user=pi/g' /etc/lightdm/lightdm.conf
+sudo apt -y remove --purge x11-common  > /dev/null 2>&1;
+sudo systemctl stop gldriver-test.service > /dev/null 2>&1;
+sudo systemctl disable gldriver-test.service > /dev/null 2>&1;
+if grep -q "splash" /boot/cmdline.txt ; then
+    sudo sed -i /boot/cmdline.txt -e "s/ quiet//"
+    sudo sed -i /boot/cmdline.txt -e "s/ splash//"
+    sudo sed -i /boot/cmdline.txt -e "s/ plymouth.ignore-serial-consoles//"
+fi
+stop_spinner $?
+start_spinner "Removing FTP"
+sudo apt -y remove --purge vsftpd  > /dev/null 2>&1;
+stop_spinner $?
+start_spinner "Updating Raspberry Pi"
+sudo apt -y full-upgrade > /dev/null 2>&1;
+stop_spinner $?
+start_spinner "Installing dependencies"
+sudo apt -y install ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip > /dev/null 2>&1;
+pip install omxplayer-wrapper > /dev/null 2>&1;
+stop_spinner $?
+start_spinner "Enabling firewall and allow only 22/ssh"
+sudo ufw allow 22 > /dev/null 2>&1;
+sudo ufw --force enable > /dev/null 2>&1;
+sudo ufw limit ssh/tcp > /dev/null 2>&1;
+stop_spinner $?
+start_spinner "Disabling auto login"
+sudo systemctl set-default multi-user.target > /dev/null 2>&1;
+sudo ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service > /dev/null 2>&1;
+sudo rm /etc/systemd/system/getty@tty1.service.d/autologin.conf > /dev/null 2>&1;
+stop_spinner $?
+start_spinner "Removing uneccessary packages"
+sudo apt -y autoremove > /dev/null 2>&1;
+sudo apt -y autoclean > /dev/null 2>&1;
+stop_spinner $?
+#start_spinner "Creating uop user"
+#sudo adduser -p $(openssl passwd -crypt $PASS) --gecos "" $USER > /dev/null 2>&1;
+#sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,gpio,i2c,spi $USERNAME > /dev/null 2>&1;
+#start_spinner "Deleting pi user"
+#sudo deluser -remove-home pi > /dev/null 2>&1;
+#stop_spinner $?
+start_spinner "Restarting in 5 secs (CTRL + C to cancel)"
+sleep 1
+stop_spinner $?
+sleep 5
+sudo reboot
