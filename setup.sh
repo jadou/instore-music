@@ -104,7 +104,7 @@ start_spinner "Updating Raspberry Pi"
 sudo apt -y full-upgrade > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Installing dependencies"
-sudo apt -y install ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio > /dev/null 2>&1;
+sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio > /dev/null 2>&1;
 pip install omxplayer-wrapper pathlib > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Enabling firewall and allow only 22/ssh"
@@ -156,6 +156,8 @@ ExecStart=/usr/bin/python /home/pi/music.py
 [Install]
 WantedBy=multi-user.target
 " > /etc/systemd/system/instore_music.service' > /dev/null 2>&1;
+    sudo systemctl enable instore_music > /dev/null 2>&1;
+    sudo systemctl start instore_music > /dev/null 2>&1;
 fi
 stop_spinner $?
 start_spinner "Restarting in 5 secs (CTRL + C to cancel)"
