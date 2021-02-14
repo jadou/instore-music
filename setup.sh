@@ -66,12 +66,20 @@ trap exitc INT
 USERNAME=uop
 PASSWORD=uop
 
+sudo bash -c 'echo -e "
+      __   __   __   ___
+|  | |__) /  \ |__) |__  |\ | |\ |
+\__/ |  \ \__/ |    |___ | \| | \|
+            __          ___            ___ ___  ___
+ |\/| |  | /__\` | |__/ |__  |\ | |__| |__   |  |__  |\ |
+ |  | \__/ .__/ | |  \ |___ | \| |  | |___  |  |___ | \|
+
+" > /etc/motd' > /dev/null 2>&1;
 start_spinner "Updating apt sources"
 sudo apt update > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Removing Raspberry Pi GUI"
-#sudo sed -i 's/autologin-user=pi/#autologin-user=pi/g' /etc/lightdm/lightdm.conf
-sudo apt -y remove --purge x11-common  > /dev/null 2>&1;
+sudo apt -y remove --purge x11-common plymouth > /dev/null 2>&1;
 sudo systemctl stop gldriver-test.service > /dev/null 2>&1;
 sudo systemctl disable gldriver-test.service > /dev/null 2>&1;
 if grep -q "splash" /boot/cmdline.txt ; then
@@ -79,16 +87,25 @@ if grep -q "splash" /boot/cmdline.txt ; then
     sudo sed -i /boot/cmdline.txt -e "s/ splash//"
     sudo sed -i /boot/cmdline.txt -e "s/ plymouth.ignore-serial-consoles//"
 fi
-stop_spinner $?
-start_spinner "Removing FTP"
-sudo apt -y remove --purge vsftpd  > /dev/null 2>&1;
+if [[ -f "/home/pi/Desktop" ]]; then
+    rm -R /home/pi/Desktop > /dev/null 2>&1;
+    rm -R /home/pi/Documents > /dev/null 2>&1;
+    rm -R /home/pi/Downloads > /dev/null 2>&1;
+    sudo rm -R /home/pi/ftp > /dev/null 2>&1;
+    rm -R /home/pi/MagPi > /dev/null 2>&1;
+    rm -R /home/pi/Music > /dev/null 2>&1;
+    rm -R /home/pi/Pictures > /dev/null 2>&1;
+    rm -R /home/pi/Public > /dev/null 2>&1;
+    rm -R /home/pi/Templates > /dev/null 2>&1;
+    rm -R /home/pi/Videos > /dev/null 2>&1;
+fi
 stop_spinner $?
 start_spinner "Updating Raspberry Pi"
 sudo apt -y full-upgrade > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Installing dependencies"
-sudo apt -y install ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip > /dev/null 2>&1;
-pip install omxplayer-wrapper > /dev/null 2>&1;
+sudo apt -y install ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio > /dev/null 2>&1;
+pip install omxplayer-wrapper pathlib > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Enabling firewall and allow only 22/ssh"
 sudo ufw allow 22 > /dev/null 2>&1;
@@ -98,11 +115,20 @@ stop_spinner $?
 start_spinner "Disabling auto login"
 sudo systemctl set-default multi-user.target > /dev/null 2>&1;
 sudo ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service > /dev/null 2>&1;
-sudo rm /etc/systemd/system/getty@tty1.service.d/autologin.conf > /dev/null 2>&1;
+if [[ -f "/etc/systemd/system/getty@tty1.service.d/autologin.conf" ]]; then
+    sudo rm /etc/systemd/system/getty@tty1.service.d/autologin.conf > /dev/null 2>&1;
+fi
+stop_spinner $?
+start_spinner "Disabling bluetooth"
+grep -qxF 'dtoverlay=disable-bt' /boot/config.txt || sudo bash -c 'echo "dtoverlay=disable-bt" >> /boot/config.txt' > /dev/null 2>&1;
+sudo systemctl disable hciuart.service > /dev/null 2>&1;
+sudo systemctl disable bluetooth.service > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Removing uneccessary packages"
+sudo apt -y remove --purge vsftpd  > /dev/null 2>&1;
 sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
+grep -qxF 'net.ipv4.tcp_timestamps = 0' /etc/sysctl.conf || sudo bash -c 'echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf' && sysctl -p > /dev/null 2>&1;
 stop_spinner $?
 #start_spinner "Creating uop user"
 #sudo adduser -p $(openssl passwd -crypt $PASS) --gecos "" $USER > /dev/null 2>&1;
@@ -110,6 +136,28 @@ stop_spinner $?
 #start_spinner "Deleting pi user"
 #sudo deluser -remove-home pi > /dev/null 2>&1;
 #stop_spinner $?
+start_spinner "Setting volume to 80%"
+sudo amixer -q -M sset 'Headphone' 80%
+stop_spinner $?
+start_spinner "Creating service"
+if [[ ! -f "/etc/systemd/system/instore_music.service" ]]; then
+    sudo bash -c 'echo -e "
+[Unit]
+Description=Play in-store music
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=uop
+ExecStart=/usr/bin/python /home/pi/music.py
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/instore_music.service' > /dev/null 2>&1;
+fi
+stop_spinner $?
 start_spinner "Restarting in 5 secs (CTRL + C to cancel)"
 sleep 1
 stop_spinner $?
