@@ -151,7 +151,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=uop
-ExecStart=/usr/bin/python /home/pi/music.py
+ExecStart=/usr/bin/python /home/pi/instore-music/music.py
 
 [Install]
 WantedBy=multi-user.target
