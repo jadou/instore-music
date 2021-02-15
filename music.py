@@ -8,7 +8,7 @@ import math
 import os
 
 MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_urbanfash?mp=/stream'
-GAP = 10 #in seconds
+GAP = 600 #in seconds
 REMOTE_SERVER = '1.1.1.1'
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir_path, 'announce')
