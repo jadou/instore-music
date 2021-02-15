@@ -124,13 +124,13 @@ sudo systemctl disable hciuart.service > /dev/null 2>&1;
 sudo systemctl disable bluetooth.service > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Removing uneccessary packages"
-sudo apt -y remove --purge vsftpd  > /dev/null 2>&1;
+sudo apt -y remove --purge vsftpd > /dev/null 2>&1;
 sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
 grep -qxF 'net.ipv4.tcp_timestamps = 0' /etc/sysctl.conf || sudo bash -c 'echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf' && sysctl -p > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Setting volume to 80%"
-sudo amixer -q -M sset 'Headphone' 80%
+sudo amixer -q -M sset 'Headphone' 80% > /dev/null 2>&1
 stop_spinner $?
 start_spinner "Creating service"
 if [[ ! -f "/etc/systemd/system/instore_music.service" ]]; then
