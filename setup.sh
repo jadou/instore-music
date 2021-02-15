@@ -63,9 +63,6 @@ function exitc {
 
 trap exitc INT
 
-USERNAME=uop
-PASSWORD=uop
-
 sudo bash -c 'echo -e "
       __   __   __   ___
 |  | |__) /  \ |__) |__  |\ | |\ |
@@ -87,7 +84,7 @@ if grep -q "splash" /boot/cmdline.txt ; then
     sudo sed -i /boot/cmdline.txt -e "s/ splash//"
     sudo sed -i /boot/cmdline.txt -e "s/ plymouth.ignore-serial-consoles//"
 fi
-if [[ -f "/home/pi/Desktop" ]]; then
+if [[ -d "/home/pi/Desktop" ]]; then
     rm -R /home/pi/Desktop > /dev/null 2>&1;
     rm -R /home/pi/Documents > /dev/null 2>&1;
     rm -R /home/pi/Downloads > /dev/null 2>&1;
@@ -130,12 +127,6 @@ sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
 grep -qxF 'net.ipv4.tcp_timestamps = 0' /etc/sysctl.conf || sudo bash -c 'echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf' && sysctl -p > /dev/null 2>&1;
 stop_spinner $?
-#start_spinner "Creating uop user"
-#sudo adduser -p $(openssl passwd -crypt $PASS) --gecos "" $USER > /dev/null 2>&1;
-#sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,gpio,i2c,spi $USERNAME > /dev/null 2>&1;
-#start_spinner "Deleting pi user"
-#sudo deluser -remove-home pi > /dev/null 2>&1;
-#stop_spinner $?
 start_spinner "Setting volume to 80%"
 sudo amixer -q -M sset 'Headphone' 80%
 stop_spinner $?
@@ -150,7 +141,7 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=1
-User=uop
+User=pi
 ExecStart=/usr/bin/python /home/pi/instore-music/music.py
 
 [Install]
