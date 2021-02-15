@@ -103,7 +103,7 @@ start_spinner "Updating Raspberry Pi"
 sudo apt -y full-upgrade > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Installing dependencies"
-sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio > /dev/null 2>&1;
+sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev > /dev/null 2>&1;
 pip install omxplayer-wrapper pathlib > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Enabling firewall and allow only 22/ssh"
@@ -152,6 +152,14 @@ WantedBy=multi-user.target
     sudo systemctl enable instore_music > /dev/null 2>&1;
     sudo systemctl start instore_music > /dev/null 2>&1;
 fi
+stop_spinner $?
+start_spinner "Updating OpenSSH"
+$ wget -c https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.4p1.tar.gz > /dev/null 2>&1;
+tar -xzf openssh-8.4p1.tar.gz > /dev/null 2>&1;
+cd openssh-8.4p1/
+./configure --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh > /dev/null 2>&1;
+make > /dev/null 2>&1;
+sudo make install > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Restarting in 5 secs (CTRL + C to cancel)"
 sleep 1
