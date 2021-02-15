@@ -63,6 +63,7 @@ function exitc {
 
 trap exitc INT
 
+sudo sed -i 's/raspberrypi/raspberry/g' /etc/hosts
 sudo bash -c 'echo -e "
       __   __   __   ___
 |  | |__) /  \ |__) |__  |\ | |\ |
@@ -72,6 +73,7 @@ sudo bash -c 'echo -e "
  |  | \__/ .__/ | |  \ |___ | \| |  | |___  |  |___ | \|
 
 " > /etc/motd' > /dev/null 2>&1;
+
 start_spinner "Updating apt sources"
 sudo apt update > /dev/null 2>&1;
 stop_spinner $?
