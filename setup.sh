@@ -160,6 +160,9 @@ cd openssh-8.4p1/
 ./configure --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh > /dev/null 2>&1;
 make > /dev/null 2>&1;
 sudo make install > /dev/null 2>&1;
+cd $HOME
+rm /home/pi/openssh-8.4p1.tar.gz
+rm -R /home/pi/openssh-8.4p1
 stop_spinner $?
 start_spinner "Restarting in 5 secs (CTRL + C to cancel)"
 sleep 1
