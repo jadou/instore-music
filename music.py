@@ -8,7 +8,7 @@ import math
 import os
 
 MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_urbanfash?mp=/stream'
-GAP = 600 #in seconds
+GAP = 10 #in seconds
 REMOTE_SERVER = '1.1.1.1'
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -16,6 +16,7 @@ path = os.path.join(dir_path, 'announce')
 
 def is_connected(hostname):
     try:
+        print("Testing internet connection...")
         host = socket.gethostbyname(hostname)
         s = socket.create_connection((host, 80), 2)
         s.close()
@@ -48,7 +49,6 @@ def main():
 
 def announce(a, p):
     for i in a:
-        CAN_CONTINUE = True
         sleep(GAP)
         p.set_volume(0.8)
         sleep(1)
