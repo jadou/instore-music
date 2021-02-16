@@ -50,6 +50,7 @@ def announce(a, p, t=0):
                 sleep(1)
                 announce(a, p, t)
             else:
+                p.quit()
                 main()
         for i in a:
             p.set_volume(0.8)
