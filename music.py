@@ -37,6 +37,10 @@ def main():
         player.set_volume(1)
         if announcements:
             announce(announcements, player)
+        while True:
+            if not is_connected(REMOTE_SERVER):
+                clearAll()
+
     else:
         print("Not connected to the internet. Retrying in 5 seconds.")
         sleep(5)
@@ -44,39 +48,32 @@ def main():
 
 def announce(a, p):
     for i in a:
-        if is_connected(REMOTE_SERVER):
-            CAN_CONTINUE = True
-            sleep(GAP)
-            p.set_volume(0.8)
-            sleep(1)
-            p.set_volume(0.6)
-            sleep(1)
-            p.set_volume(0.4)
-            sleep(1)
-            p.set_volume(0.2)
-            sleep(1)
-            p.set_volume(0)
-            player_announce = OMXPlayer(os.path.join(path, i), args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer2')
-            player_announce.set_volume(1)
-            duration = int(math.ceil(player_announce.duration()))
-            sleep(duration)
-            player_announce.quit()
-            p.set_volume(0.2)
-            sleep(1)
-            p.set_volume(0.4)
-            sleep(1)
-            p.set_volume(0.6)
-            sleep(1)
-            p.set_volume(0.8)
-            sleep(1)
-            p.set_volume(1)
-        else:
-            CAN_CONTINUE = False
-            break
-    if CAN_CONTINUE:
-        announce(a, p)
-    else:
-        clearAll()
+        CAN_CONTINUE = True
+        sleep(GAP)
+        p.set_volume(0.8)
+        sleep(1)
+        p.set_volume(0.6)
+        sleep(1)
+        p.set_volume(0.4)
+        sleep(1)
+        p.set_volume(0.2)
+        sleep(1)
+        p.set_volume(0)
+        player_announce = OMXPlayer(os.path.join(path, i), args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer2')
+        player_announce.set_volume(1)
+        duration = int(math.ceil(player_announce.duration()))
+        sleep(duration)
+        player_announce.quit()
+        p.set_volume(0.2)
+        sleep(1)
+        p.set_volume(0.4)
+        sleep(1)
+        p.set_volume(0.6)
+        sleep(1)
+        p.set_volume(0.8)
+        sleep(1)
+        p.set_volume(1)
+    announce(a, p)
 
 if __name__ == '__main__':
     main()
