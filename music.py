@@ -46,7 +46,6 @@ def announce(a, p, t=0):
         if t < GAP:
             if is_connected(REMOTE_SERVER):
                 t += 1
-                print(t)
                 sleep(1)
                 announce(a, p, t)
             else:
