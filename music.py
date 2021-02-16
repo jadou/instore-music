@@ -20,14 +20,15 @@ def is_connected(hostname):
         host = socket.gethostbyname(hostname)
         s = socket.create_connection((host, 80), 2)
         s.close()
+        print("Connected.")
         return True
     except:
         pass
+    print("No internet connection.")
     return False
 
 def main():
     if is_connected(REMOTE_SERVER):
-        print("Connected to the internet.")
         announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         print("Playing %s" % MUSIC_STREAM)
@@ -40,10 +41,17 @@ def main():
         sleep(5)
         main()
 
-def announce(a, p):
+def announce(a, p, t=0):
     try:
+        if t < GAP:
+            if is_connected(REMOTE_SERVER):
+                t += 1
+                print(t)
+                sleep(1)
+                announce(a, p, t)
+            else:
+                main()
         for i in a:
-            sleep(GAP)
             p.set_volume(0.8)
             sleep(1)
             p.set_volume(0.6)
@@ -67,6 +75,8 @@ def announce(a, p):
             p.set_volume(0.8)
             sleep(1)
             p.set_volume(1)
+            sleep(GAP)
+        announce(a, p)
     except:
         main()
 
