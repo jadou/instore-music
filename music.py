@@ -17,7 +17,8 @@ path = os.path.join(dir_path, 'announce')
 def main():
     print("Starting main")
     announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
+    player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local --live', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
+    sleep(2)
     print("Playing %s" % MUSIC_STREAM)
     player.set_volume(1)
     if announcements:
