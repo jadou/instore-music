@@ -10,6 +10,7 @@ import os
 MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_urbanfash?mp=/stream'
 GAP = 600 #in seconds
 REMOTE_SERVER = '1.1.1.1'
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir_path, 'announce')
 
@@ -22,6 +23,10 @@ def is_connected(hostname):
     except:
         pass
     return False
+
+def clearAll():
+    player.quit()
+    main()
 
 def main():
     if is_connected(REMOTE_SERVER):
@@ -38,8 +43,9 @@ def main():
         main()
 
 def announce(a, p):
-    if is_connected(REMOTE_SERVER): 
-        for i in a:
+    for i in a:
+        if is_connected(REMOTE_SERVER):
+            CAN_CONTINUE = True
             sleep(GAP)
             p.set_volume(0.8)
             sleep(1)
@@ -64,9 +70,13 @@ def announce(a, p):
             p.set_volume(0.8)
             sleep(1)
             p.set_volume(1)
+        else:
+            CAN_CONTINUE = False
+            break
+    if CAN_CONTINUE:
         announce(a, p)
     else:
-        main()
+        clearAll()
 
 if __name__ == '__main__':
     main()

@@ -150,7 +150,7 @@ ExecStart=/usr/bin/python /home/pi/instore-music/music.py
 WantedBy=multi-user.target
 " > /etc/systemd/system/instore_music.service' > /dev/null 2>&1;
     sudo systemctl enable instore_music > /dev/null 2>&1;
-    sudo systemctl start instore_music > /dev/null 2>&1;
+    #sudo systemctl start instore_music > /dev/null 2>&1;
 fi
 stop_spinner $?
 start_spinner "Updating OpenSSH"
