@@ -25,10 +25,6 @@ def is_connected(hostname):
         pass
     return False
 
-def clearAll(p):
-    p.quit()
-    main()
-
 def main():
     if is_connected(REMOTE_SERVER):
         print("Connected to the internet.")
@@ -45,9 +41,8 @@ def main():
         main()
 
 def announce(a, p):
-    for i in a:
-        if p.is_playing():
-            CAN_CONTINUE = True
+    try:
+        for i in a:
             sleep(GAP)
             p.set_volume(0.8)
             sleep(1)
@@ -72,14 +67,8 @@ def announce(a, p):
             p.set_volume(0.8)
             sleep(1)
             p.set_volume(1)
-        else:
-            CAN_CONTINUE = False
-            break
-    if CAN_CONTINUE:
-        announce(a, p)
-    else:
-        clearAll(p)
-
+    except:
+        main()
 
 if __name__ == '__main__':
     main()
