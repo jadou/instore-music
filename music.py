@@ -14,45 +14,27 @@ REMOTE_SERVER = '1.1.1.1'
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir_path, 'announce')
 
-def is_connected(hostname):
-    try:
-        host = socket.gethostbyname(hostname)
-        s = socket.create_connection((host, 80), 4)
-        s.close()
-        return True
-    except:
-        pass
-    print("No internet connection.")
-    return False
-
 def main():
-    if is_connected(REMOTE_SERVER):
-        try:
-            player.quit()
-        except:
-            pass
-        print("im here")
-        announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-        player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
-        print("Playing %s" % MUSIC_STREAM)
-        player.set_volume(1)
-        if announcements:
-            announce(announcements, player)
-
-    else:
-        print("Not connected to the internet. Retrying in 5 seconds.")
-        sleep(5)
-        main()
+    print("Starting main")
+    announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+    player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
+    print("Playing %s" % MUSIC_STREAM)
+    player.set_volume(1)
+    if announcements:
+        announce(announcements, player)
 
 def announce(a, p, t=0):
     try:
         if t < GAP:
-            if is_connected(REMOTE_SERVER):
+            if p.is_playing():
                 t += 1
                 sleep(1)
                 announce(a, p, t)
             else:
-                p.quit()
+                try:
+                    p.quit()
+                except:
+                    pass
                 print("from GAP")
                 main()
         for i in a:
@@ -82,9 +64,12 @@ def announce(a, p, t=0):
             sleep(GAP)
         announce(a, p)
     except:
-        print("from announce except")
+        try:
+            p.quit()
+        except:
+            pass
+        print("Announce except")
         main()
 
 if __name__ == '__main__':
-    print("started")
     main()
