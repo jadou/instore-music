@@ -63,6 +63,9 @@ function exitc {
 
 trap exitc INT
 
+device=$(hostname -I)
+curl -k -X POST -F "started=${device}" https://app-dev.uropenn.se/updatemusicbox/index.php > /dev/null 2>&1;
+
 sudo sed -i 's/raspberrypi/raspberry/g' /etc/hosts
 sudo bash -c 'echo -e "
       __   __   __   ___
@@ -168,6 +171,7 @@ rm /home/pi/openssh-8.4p1.tar.gz
 rm -R /home/pi/openssh-8.4p1
 stop_spinner $?
 start_spinner "Restarting in 5 secs (CTRL + C to cancel)"
+curl -k -X POST -F "done=${device}" https://app-dev.uropenn.se/updatemusicbox/index.php > /dev/null 2>&1;
 sleep 1
 stop_spinner $?
 sleep 5
