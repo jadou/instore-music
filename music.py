@@ -16,11 +16,9 @@ path = os.path.join(dir_path, 'announce')
 
 def is_connected(hostname):
     try:
-        print("Testing internet connection...")
         host = socket.gethostbyname(hostname)
-        s = socket.create_connection((host, 80), 2)
+        s = socket.create_connection((host, 80), 4)
         s.close()
-        print("Connected.")
         return True
     except:
         pass
@@ -29,6 +27,11 @@ def is_connected(hostname):
 
 def main():
     if is_connected(REMOTE_SERVER):
+        try:
+            player.quit()
+        except:
+            pass
+        print("im here")
         announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         print("Playing %s" % MUSIC_STREAM)
@@ -50,6 +53,7 @@ def announce(a, p, t=0):
                 announce(a, p, t)
             else:
                 p.quit()
+                print("from GAP")
                 main()
         for i in a:
             p.set_volume(0.8)
@@ -78,7 +82,9 @@ def announce(a, p, t=0):
             sleep(GAP)
         announce(a, p)
     except:
+        print("from announce except")
         main()
 
 if __name__ == '__main__':
+    print("started")
     main()
