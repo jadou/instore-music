@@ -3,20 +3,23 @@
 from omxplayer.player import OMXPlayer
 from pathlib import Path
 from time import sleep
-import socket
 import math
+import commands
 import os
 
 MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_urbanfash?mp=/stream'
 GAP = 600 #in seconds
 
-hostname = socket.gethostname()
-print(hostname)
-local_ip = socket.gethostbyname(hostname)
-print(local_ip)
+hostname = commands.getoutput('hostname -I')
+h_split = hostname.split()
+i_split = h_split[0].split('.')
+country = 'sweden'
+if i_split[1] == '7':
+    country = 'finland'
 
+print(country)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-path = os.path.join(dir_path, 'announce')
+path = os.path.join(dir_path, os.path.join('announce', country))
 
 def main():
     try:
@@ -26,6 +29,7 @@ def main():
         print("Playing %s" % MUSIC_STREAM)
         player.set_volume(1)
         if announcements:
+            print("Has announcements")
             while True:
                 for announce in announcements:
                     for n in range(GAP):
@@ -55,6 +59,8 @@ def main():
                     player.set_volume(0.8)
                     sleep(1)
                     player.set_volume(1)
+        else:
+            print("No announcements found")
     except:
         try:
             player.quit()

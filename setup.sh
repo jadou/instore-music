@@ -147,6 +147,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=pi
+ExecStartPre=/usr/bin/git -C /home/pi/instore-music pull
 ExecStart=/usr/bin/python /home/pi/instore-music/music.py
 
 [Install]
