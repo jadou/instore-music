@@ -24,7 +24,7 @@ path = os.path.join(dir_path, os.path.join('announce', country))
 def main():
     try:
         print("Starting player...")
-        announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        announcements = [f for f in os.listdir(path) if not f.startswith('.') and os.path.isfile(os.path.join(path, f))]
         player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         print("Playing %s" % MUSIC_STREAM)
         player.set_volume(1)
