@@ -80,6 +80,35 @@ sudo bash -c 'echo -e "
 start_spinner "Updating apt sources"
 sudo apt update > /dev/null 2>&1;
 stop_spinner $?
+start_spinner "Installing dependencies"
+sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev > /dev/null 2>&1;
+pip install omxplayer-wrapper pathlib > /dev/null 2>&1;
+stop_spinner $?
+start_spinner "Killing chromium"
+pkill chromium-browse
+stop_spinner $?
+start_spinner "Creating service"
+if [[ ! -f "/etc/systemd/system/instore_music.service" ]]; then
+    sudo bash -c 'echo -e "
+[Unit]
+Description=Play in-store music
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+ExecStartPre=/usr/bin/git -C /home/pi/instore-music pull
+ExecStart=/usr/bin/python /home/pi/instore-music/music.py
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/instore_music.service' > /dev/null 2>&1;
+    sudo systemctl enable instore_music > /dev/null 2>&1;
+    sudo systemctl start instore_music > /dev/null 2>&1;
+fi
+stop_spinner $?
 start_spinner "Removing Raspberry Pi GUI"
 sudo apt -y remove --purge x11-common plymouth > /dev/null 2>&1;
 sudo systemctl stop gldriver-test.service > /dev/null 2>&1;
@@ -104,10 +133,6 @@ fi
 stop_spinner $?
 start_spinner "Updating Raspberry Pi"
 sudo apt -y full-upgrade > /dev/null 2>&1;
-stop_spinner $?
-start_spinner "Installing dependencies"
-sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev > /dev/null 2>&1;
-pip install omxplayer-wrapper pathlib > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Enabling firewall and allow only 22/ssh"
 sudo ufw allow 22 > /dev/null 2>&1;
@@ -178,5 +203,4 @@ curl -k -X POST -F "done=${device}" https://app-dev.uropenn.se/updatemusicbox/in
 sleep 1
 stop_spinner $?
 sleep 5
-sudo systemctl start instore_music > /dev/null 2>&1;
 sudo reboot
