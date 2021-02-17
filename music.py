@@ -5,8 +5,6 @@ from pathlib import Path
 from time import sleep
 import math
 import commands
-import requests
-from urllib3.exceptions import InsecureRequestWarning
 import os
 
 MUSIC_STREAM = 'https://uop.link/in-store-music-finland'
@@ -22,16 +20,12 @@ if i_split[1] == '7':
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir_path, os.path.join('announce', country))
 
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-stream = requests.get(MUSIC_STREAM, verify=False)
-stream_url = stream.url
-
 def main():
     try:
         print("Starting player...")
         announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-        player = OMXPlayer(stream_url, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
-        print("Playing %s" % stream_url)
+        player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
+        print("Playing %s" % MUSIC_STREAM)
         player.set_volume(1)
         if announcements:
             print("Announcements found for %s" % country)
