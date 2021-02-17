@@ -10,11 +10,16 @@ import os
 MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_urbanfash?mp=/stream'
 GAP = 600 #in seconds
 
+hostname = socket.gethostname()
+print(hostname)
+local_ip = socket.gethostbyname(hostname)
+print(local_ip)
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path = os.path.join(dir_path, 'announce')
 
 def main():
-    try: 
+    try:
         print("Starting main")
         announcements = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         player = OMXPlayer(MUSIC_STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
