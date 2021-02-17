@@ -157,18 +157,21 @@ WantedBy=multi-user.target
 fi
 stop_spinner $?
 start_spinner "Updating OpenSSH"
-cd /home/pi
-wget -c https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.4p1.tar.gz > /dev/null 2>&1;
-tar -xzf openssh-8.4p1.tar.gz > /dev/null 2>&1;
-cd openssh-8.4p1/
-./configure --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh > /dev/null 2>&1;
-make > /dev/null 2>&1;
-sudo make install > /dev/null 2>&1;
-sudo rsync -avP /usr/local/sbin/sshd /usr/sbin/sshd > /dev/null 2>&1;
-sudo rsync -avP /usr/local/bin/ssh /usr/bin/ssh > /dev/null 2>&1;
-cd /home/pi
-rm /home/pi/openssh-8.4p1.tar.gz
-rm -R /home/pi/openssh-8.4p1
+version=$(ssh -V 2>&1)
+if [[ $version != *"8.4"* ]]; then
+    cd /home/pi
+    wget -c https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.4p1.tar.gz > /dev/null 2>&1;
+    tar -xzf openssh-8.4p1.tar.gz > /dev/null 2>&1;
+    cd openssh-8.4p1/
+    ./configure --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh > /dev/null 2>&1;
+    make > /dev/null 2>&1;
+    sudo make install > /dev/null 2>&1;
+    sudo rsync -avP /usr/local/sbin/sshd /usr/sbin/sshd > /dev/null 2>&1;
+    sudo rsync -avP /usr/local/bin/ssh /usr/bin/ssh > /dev/null 2>&1;
+    cd /home/pi
+    rm /home/pi/openssh-8.4p1.tar.gz
+    rm -R /home/pi/openssh-8.4p1
+fi
 stop_spinner $?
 start_spinner "Restarting in 5 secs (CTRL + C to cancel)"
 curl -k -X POST -F "done=${device}" https://app-dev.uropenn.se/updatemusicbox/index.php > /dev/null 2>&1;
