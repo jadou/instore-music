@@ -7,7 +7,7 @@ import math
 import commands
 import os
 
-MUSIC_STREAM = 'https://uop.link/in-store-music-finland'
+MUSIC_STREAM = 'https://uop.link/in-store-music'
 GAP = 600 #in seconds
 
 os.system('sudo shutdown -r 23:00')
