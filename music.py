@@ -10,6 +10,7 @@ import os
 MUSIC_STREAM = 'https://uop.link/in-store-music-finland'
 GAP = 600 #in seconds
 
+os.system('sudo shutdown -r 23:00')
 hostname = commands.getoutput('hostname -I')
 h_split = hostname.split()
 i_split = h_split[0].split('.')
