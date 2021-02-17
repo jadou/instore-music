@@ -9,7 +9,7 @@ import requests
 from urllib3.exceptions import InsecureRequestWarning
 import os
 
-MUSIC_STREAM = 'https://uop.link/in-store-music'
+MUSIC_STREAM = 'https://uop.link/in-store-music-finland'
 GAP = 600 #in seconds
 
 hostname = commands.getoutput('hostname -I')
