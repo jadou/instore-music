@@ -156,6 +156,9 @@ WantedBy=multi-user.target
     sudo systemctl enable instore_music > /dev/null 2>&1;
 fi
 stop_spinner $?
+start_spinner "Adding reboot to crontab"
+(crontab -l 2>/dev/null | grep '0 22 * * * sudo /sbin/reboot') || { crontab -l 2>/dev/null; '0 22 * * * sudo /sbin/reboot'; } | crontab -
+stop_spinner $?
 start_spinner "Updating OpenSSH"
 cd /home/pi
 wget -c https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.4p1.tar.gz > /dev/null 2>&1;
