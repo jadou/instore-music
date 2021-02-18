@@ -157,30 +157,6 @@ sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
 grep -qxF 'net.ipv4.tcp_timestamps = 0' /etc/sysctl.conf || sudo bash -c 'echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf' && sudo sysctl -p > /dev/null 2>&1;
 stop_spinner $?
-#start_spinner "Setting volume to 80%"
-#sudo amixer -q -M sset 'Headphone' 80% > /dev/null 2>&1
-#stop_spinner $?
-start_spinner "Creating service"
-if [[ ! -f "/etc/systemd/system/instore_music.service" ]]; then
-    sudo bash -c 'echo -e "
-[Unit]
-Description=Play in-store music
-After=network.target
-StartLimitIntervalSec=0
-[Service]
-Type=simple
-Restart=always
-RestartSec=1
-User=pi
-ExecStartPre=/usr/bin/git -C /home/pi/instore-music pull
-ExecStart=/usr/bin/python /home/pi/instore-music/music.py
-
-[Install]
-WantedBy=multi-user.target
-" > /etc/systemd/system/instore_music.service' > /dev/null 2>&1;
-    sudo systemctl enable instore_music > /dev/null 2>&1;
-fi
-stop_spinner $?
 start_spinner "Updating OpenSSH"
 version=$(ssh -V 2>&1)
 if [[ $version != *"8.4"* ]]; then
