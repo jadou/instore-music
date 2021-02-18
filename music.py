@@ -23,6 +23,7 @@ path = os.path.join(dir_path, os.path.join('announce', country))
 announcements = []
 
 def main():
+    global announcements
     try:
         print("Starting player...")
         if os.path.exists(path):
