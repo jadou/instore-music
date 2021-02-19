@@ -81,7 +81,7 @@ start_spinner "Updating apt sources"
 sudo apt update > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Installing dependencies"
-sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev > /dev/null 2>&1;
+sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev rsync > /dev/null 2>&1;
 pip install omxplayer-wrapper pathlib > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Killing chromium"
