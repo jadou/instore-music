@@ -6,6 +6,7 @@ from time import sleep
 import math
 import commands
 import os
+import sys
 
 MUSIC_STREAM = 'https://uop.link/in-store-music'
 ALT_MUSIC_STREAM = 'http://19293.live.streamtheworld.com/SP_R3449667_SC'
@@ -22,6 +23,7 @@ store_start = 'FI6' if i_split[1] == '7' else i_split[1]
 store_end = '%02d' % (int(i_split[2]))
 store = store_start + store_end
 print("Detected store: %s" % (store))
+sys.stdout.flush()
 dir_path = os.path.dirname(os.path.realpath(__file__))
 announcements_path = os.path.join(dir_path, os.path.join('announce', country))
 alt_music_list_path = os.path.join(dir_path, 'alt_music_list.txt')
@@ -33,7 +35,9 @@ def main():
     global announcements
     try:
         print("Starting player...")
+        sys.stdout.flush()
         print("Selecting stream...")
+        sys.stdout.flush()
         if os.path.exists(alt_music_list_path) and os.path.isfile(alt_music_list_path):
             alt_music_list_file = open(alt_music_list_path, 'r')
             alt_music_list = [f.strip() for f in alt_music_list_file.readlines()]
@@ -43,17 +47,21 @@ def main():
             STREAM = MUSIC_STREAM
         player = OMXPlayer(STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         print("Playing %s" % STREAM)
+        sys.stdout.flush()
         player.set_volume(1)
         print("Checking for announcements...")
+        sys.stdout.flush()
         if os.path.exists(announcements_path):
             announcements = [f for f in os.listdir(announcements_path) if not f.startswith('.') and os.path.isfile(os.path.join(announcements_path, f))]
         if announcements:
             print("Announcements found for %s" % country)
+            sys.stdout.flush()
             while True:
                 for announce in announcements:
                     for n in range(GAP):
                         if not player.is_playing():
                             print("Player not playing. Restarting")
+                            sys.stdout.flush()
                             raise Exception("Player not playing. Restarting")
                         sleep(1)
                     player.set_volume(0.8)
@@ -81,12 +89,14 @@ def main():
                     player.set_volume(1)
         else:
             print("No announcements found for %s" % country)
+            sys.stdout.flush()
     except:
         try:
             player.quit()
         except:
             pass
         print("Exception")
+        sys.stdout.flush()
         main()
 
 if __name__ == '__main__':
