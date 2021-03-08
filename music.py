@@ -41,8 +41,12 @@ def main():
         if os.path.exists(alt_music_list_path) and os.path.isfile(alt_music_list_path):
             alt_music_list_file = open(alt_music_list_path, 'r')
             alt_music_list = [f.strip() for f in alt_music_list_file.readlines()]
+            print("Alternative list available")
+            sys.stdout.flush()
         if store in alt_music_list:
             STREAM = ALT_MUSIC_STREAM
+            print("store is alt store")
+            sys.stdout.flush()
         else:
             STREAM = MUSIC_STREAM
         player = OMXPlayer(STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
