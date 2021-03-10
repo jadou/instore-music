@@ -50,7 +50,7 @@ def main():
             raise Exception("Stream not available. Restarting")
         print("Starting player...")
         sys.stdout.flush()
-        player = Player()
+        player = Player(args=('-ao alsa:device=hw=1.0'))
         player.loadfile(STREAM)
         print("Playing %s" % STREAM)
         sys.stdout.flush()
