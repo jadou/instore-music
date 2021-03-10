@@ -9,7 +9,7 @@ import math, commands, os, sys, json, urllib
 #MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_hipsterp?mp=/stream'
 #https://uop.link/in-store-music-alt
 #ALT_MUSIC_STREAM = 'http://19293.live.streamtheworld.com/SP_R3449667_SC'
-GAP = 10 #in seconds
+GAP = 600 #in seconds
 
 hostname = commands.getoutput('hostname -I')
 h_split = hostname.split()
@@ -65,7 +65,7 @@ def main():
             sys.stdout.flush()
             print("Waiting for cache. Sleeping for 45 secs")
             sys.stdout.flush()
-            sleep(45)
+            sleep(120)
             while True:
                 for announce in announcements:
                     for n in range(GAP):
@@ -86,7 +86,7 @@ def main():
             sys.stdout.flush()
             print("Waiting for cache. Sleeping for 45 secs")
             sys.stdout.flush()
-            sleep(45)
+            sleep(120)
             while True:
                 if not player.is_alive():
                     raise Exception("Player not playing. Restarting")
