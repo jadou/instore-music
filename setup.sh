@@ -154,7 +154,7 @@ sudo systemctl disable hciuart.service > /dev/null 2>&1;
 sudo systemctl disable bluetooth.service > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Removing uneccessary packages"
-pip uninstall -y omxplayer-wrapper
+pip uninstall -y omxplayer-wrapper > /dev/null 2>&1;
 sudo apt -y remove --purge vsftpd > /dev/null 2>&1;
 sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
