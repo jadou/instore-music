@@ -63,7 +63,7 @@ def main():
         if announcements:
             print("Announcements found for %s" % country)
             sys.stdout.flush()
-            print("Waiting for cache. Sleeping for 45 secs")
+            print("Waiting for cache. Sleeping for 2 mins")
             sys.stdout.flush()
             sleep(120)
             while True:
@@ -84,7 +84,7 @@ def main():
         else:
             print("No announcements found for %s" % country)
             sys.stdout.flush()
-            print("Waiting for cache. Sleeping for 45 secs")
+            print("Waiting for cache. Sleeping for 2 mins")
             sys.stdout.flush()
             sleep(120)
             while True:
