@@ -81,16 +81,13 @@ start_spinner "Updating apt sources"
 sudo apt update > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Installing dependencies"
-sudo apt install -y git ufw mplayer libdbus-1-dev libglib2.0-dev python-pip build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev rsync > /dev/null 2>&1;
-pip install pathlib > /dev/null 2>&1;
-pip install git+https://github.com/baudm/mplayer.py.git > /dev/null 2>&1;
+sudo apt -y install git ufw omxplayer libdbus-1-dev libglib2.0-dev python-pip python-alsaaudio build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev rsync > /dev/null 2>&1;
+pip install omxplayer-wrapper pathlib > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Killing chromium"
 pkill chromium-browse
-sleep 1
 stop_spinner $?
 start_spinner "Creating service"
-grep -qxF 'include = /home/pi/instore-music/mplayer.conf' /etc/mplayer/mplayer.conf || sudo bash -c 'echo "include = /home/pi/instore-music/mplayer.conf" >> /etc/mplayer/mplayer.conf' > /dev/null 2>&1;
 if [[ ! -f "/etc/systemd/system/instore_music.service" ]]; then
     sudo bash -c 'echo -e "
 [Unit]
@@ -113,7 +110,7 @@ WantedBy=multi-user.target
 fi
 stop_spinner $?
 start_spinner "Removing Raspberry Pi GUI"
-sudo apt -y remove --purge omxplayer plymouth python-alsaaudio > /dev/null 2>&1;
+sudo apt -y remove --purge x11-common plymouth > /dev/null 2>&1;
 sudo systemctl stop gldriver-test.service > /dev/null 2>&1;
 sudo systemctl disable gldriver-test.service > /dev/null 2>&1;
 if grep -q "splash" /boot/cmdline.txt ; then
@@ -155,12 +152,9 @@ sudo systemctl disable hciuart.service > /dev/null 2>&1;
 sudo systemctl disable bluetooth.service > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Removing uneccessary packages"
-pip uninstall -y omxplayer-wrapper > /dev/null 2>&1;
 sudo apt -y remove --purge vsftpd > /dev/null 2>&1;
 sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
-amixer cset numid=3 1 > /dev/null 2>&1;
-amixer set Headphone 96% > /dev/null 2>&1;
 grep -qxF 'net.ipv4.tcp_timestamps = 0' /etc/sysctl.conf || sudo bash -c 'echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf' && sudo sysctl -p > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Updating OpenSSH"
