@@ -11,6 +11,7 @@ import math, commands, os, sys, json, urllib
 #ALT_MUSIC_STREAM = 'http://19293.live.streamtheworld.com/SP_R3449667_SC'
 GAP = 600 #in seconds
 
+os.system('sudo shutdown -r 23:00')
 hostname = commands.getoutput('hostname -I')
 h_split = hostname.split()
 i_split = h_split[0].split('.')
