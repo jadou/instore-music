@@ -159,6 +159,7 @@ pip uninstall -y omxplayer-wrapper > /dev/null 2>&1;
 sudo apt -y remove --purge vsftpd > /dev/null 2>&1;
 sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
+amixer set Headphone 96% > /dev/null 2>&1;
 grep -qxF 'net.ipv4.tcp_timestamps = 0' /etc/sysctl.conf || sudo bash -c 'echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf' && sudo sysctl -p > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Updating OpenSSH"
