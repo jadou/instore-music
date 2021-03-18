@@ -159,29 +159,6 @@ pip uninstall -y omxplayer-wrapper > /dev/null 2>&1;
 sudo apt -y remove --purge vsftpd > /dev/null 2>&1;
 sudo apt -y autoremove > /dev/null 2>&1;
 sudo apt -y autoclean > /dev/null 2>&1;
-cat << EOF > /home/pi/.asoundrc
-pcm.!default {
-  type asym
-  playback.pcm {
-    type plug
-    slave.pcm "output"
-  }
-  capture.pcm {
-    type plug
-    slave.pcm "input"
-  }
-}
-
-pcm.output {
-  type hw
-  card 1
-}
-
-ctl.!default {
-  type hw
-  card 1
-}
-EOF > /dev/null 2>&1;
 amixer set Headphone 96% > /dev/null 2>&1;
 grep -qxF 'net.ipv4.tcp_timestamps = 0' /etc/sysctl.conf || sudo bash -c 'echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf' && sudo sysctl -p > /dev/null 2>&1;
 stop_spinner $?
