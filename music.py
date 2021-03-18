@@ -1,18 +1,16 @@
 #!/usr/bin/python
 
-from omxplayer.player import OMXPlayer
+from mplayer import Player
 from pathlib import Path
 from time import sleep
-import math
-import commands
-import os
-import sys
+import math, commands, os, sys, json, urllib
 
-MUSIC_STREAM = 'https://uop.link/in-store-music'
-ALT_MUSIC_STREAM = 'http://19293.live.streamtheworld.com/SP_R3449667_SC'
+#https://uop.link/in-store-music
+#MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_hipsterp?mp=/stream'
+#https://uop.link/in-store-music-alt
+#ALT_MUSIC_STREAM = 'http://19293.live.streamtheworld.com/SP_R3449667_SC'
 GAP = 600 #in seconds
 
-os.system('sudo shutdown -r 23:00')
 hostname = commands.getoutput('hostname -I')
 h_split = hostname.split()
 i_split = h_split[0].split('.')
@@ -28,78 +26,79 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 announcements_path = os.path.join(dir_path, os.path.join('announce', country))
 alt_music_list_path = os.path.join(dir_path, 'alt_music_list.txt')
 
-announcements = []
-alt_music_list = []
-
 def main():
-    global announcements
     try:
-        print("Starting player...")
-        sys.stdout.flush()
         print("Selecting stream...")
         sys.stdout.flush()
-        if os.path.exists(alt_music_list_path) and os.path.isfile(alt_music_list_path):
+        if os.path.isfile(alt_music_list_path):
             alt_music_list_file = open(alt_music_list_path, 'r')
             alt_music_list = [f.strip() for f in alt_music_list_file.readlines()]
             print("Alternative list available")
             sys.stdout.flush()
-        if store in alt_music_list:
-            STREAM = ALT_MUSIC_STREAM
-            print("store is alt store")
-            sys.stdout.flush()
         else:
-            STREAM = MUSIC_STREAM
-        player = OMXPlayer(STREAM, args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer1')
+            alt_music_list = []
+        if store in alt_music_list:
+            CODE = 'f6403f66f656451f8fcbf4b4fe881d9b'
+        else:
+            CODE = '79c6519c9d1b46fc8d6d341d92f4eb4d'
+        CURL = commands.getoutput("curl -s 'https://api.rebrandly.com/v1/links/%s' -H 'apikey: 77a44fcac24946679e800fadc4f84958'" % CODE)
+        JSON = json.loads(CURL)
+        STREAM = JSON["destination"]
+        print("Checking stream...")
+        sys.stdout.flush()
+        if int(urllib.urlopen(STREAM).getcode()) != 200:
+            raise Exception("Stream not available. Restarting")
+        print("Starting player...")
+        sys.stdout.flush()
+        player = Player(args=('-ao alsa:device=hw=1.0'))
+        player.loadfile(STREAM)
         print("Playing %s" % STREAM)
         sys.stdout.flush()
-        player.set_volume(1)
         print("Checking for announcements...")
         sys.stdout.flush()
         if os.path.exists(announcements_path):
             announcements = [f for f in os.listdir(announcements_path) if not f.startswith('.') and os.path.isfile(os.path.join(announcements_path, f))]
+        else:
+            announcements = []
         if announcements:
             print("Announcements found for %s" % country)
             sys.stdout.flush()
+            print("Waiting for cache. Sleeping for 2 mins")
+            sys.stdout.flush()
+            sleep(120)
             while True:
                 for announce in announcements:
                     for n in range(GAP):
-                        if not player.is_playing():
-                            print("Player not playing. Restarting")
-                            sys.stdout.flush()
+                        if not player.is_alive():
                             raise Exception("Player not playing. Restarting")
+                        if player.filename is None:
+                            raise Exception("No internet connected. Restarting")
                         sleep(1)
-                    player.set_volume(0.8)
+                    player.pause()
+                    player_announce = Player(os.path.join(announcements_path, announce))
                     sleep(1)
-                    player.set_volume(0.6)
-                    sleep(1)
-                    player.set_volume(0.4)
-                    sleep(1)
-                    player.set_volume(0.2)
-                    sleep(1)
-                    player.set_volume(0)
-                    player_announce = OMXPlayer(os.path.join(announcements_path, announce), args='--no-keys -o local', dbus_name='org.mpris.MediaPlayer2.omxplayer2')
-                    player_announce.set_volume(1)
-                    duration = int(math.ceil(player_announce.duration()))
+                    duration = int(math.ceil(player_announce.length)) - 1
                     sleep(duration)
                     player_announce.quit()
-                    player.set_volume(0.2)
-                    sleep(1)
-                    player.set_volume(0.4)
-                    sleep(1)
-                    player.set_volume(0.6)
-                    sleep(1)
-                    player.set_volume(0.8)
-                    sleep(1)
-                    player.set_volume(1)
+                    player.pause()
         else:
             print("No announcements found for %s" % country)
             sys.stdout.flush()
-    except:
+            print("Waiting for cache. Sleeping for 2 mins")
+            sys.stdout.flush()
+            sleep(120)
+            while True:
+                if not player.is_alive():
+                    raise Exception("Player not playing. Restarting")
+                if player.filename is None:
+                    raise Exception("No internet connected. Restarting")
+                sleep(1)
+    except Exception as e:
         try:
             player.quit()
         except:
             pass
-        print("Exception")
+        print(e)
         sys.stdout.flush()
         main()
 
