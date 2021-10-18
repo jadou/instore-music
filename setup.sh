@@ -78,7 +78,7 @@ sudo bash -c 'echo -e "
 " > /etc/motd' > /dev/null 2>&1;
 
 start_spinner "Updating apt sources"
-sudo apt update > /dev/null 2>&1;
+sudo apt -y update > /dev/null 2>&1;
 stop_spinner $?
 start_spinner "Installing dependencies"
 sudo apt install -y git ufw mplayer libdbus-1-dev libglib2.0-dev python-pip build-essential zlib1g-dev libssl-dev libpam0g-dev libselinux1-dev rsync > /dev/null 2>&1;
