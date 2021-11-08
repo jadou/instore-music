@@ -3,7 +3,7 @@
 from mplayer import Player
 from pathlib import Path
 from time import sleep
-import math, commands, os, sys, json, urllib
+import math, subprocess, os, sys, json, urllib
 
 #https://uop.link/in-store-music
 #MUSIC_STREAM = 'http://31.24.224.22/proxy/storetunes_hipsterp?mp=/stream'
@@ -12,7 +12,7 @@ import math, commands, os, sys, json, urllib
 GAP = 600 #in seconds
 
 os.system('sudo shutdown -r 23:00')
-hostname = commands.getoutput('hostname -I')
+hostname = subprocess.getoutput('hostname -I')
 h_split = hostname.split()
 i_split = h_split[0].split('.')
 country = 'sweden'
@@ -42,12 +42,12 @@ def main():
             CODE = 'f6403f66f656451f8fcbf4b4fe881d9b'
         else:
             CODE = '79c6519c9d1b46fc8d6d341d92f4eb4d'
-        CURL = commands.getoutput("curl -s 'https://api.rebrandly.com/v1/links/%s' -H 'apikey: 77a44fcac24946679e800fadc4f84958'" % CODE)
+        CURL = subprocess.getoutput("curl -s 'https://api.rebrandly.com/v1/links/%s' -H 'apikey: 77a44fcac24946679e800fadc4f84958'" % CODE)
         JSON = json.loads(CURL)
         STREAM = JSON["destination"]
         print("Checking stream...")
         sys.stdout.flush()
-        if int(urllib.urlopen(STREAM).getcode()) != 200:
+        if int(urllib.request.urlopen(STREAM).getcode()) != 200:
             raise Exception("Stream not available. Restarting")
         print("Starting player...")
         sys.stdout.flush()
