@@ -3,6 +3,7 @@
 from mplayer import Player
 from pathlib import Path
 from time import sleep
+from datetime import datetime
 import math, commands, os, sys, json, urllib
 
 #https://uop.link/in-store-music
@@ -24,7 +25,8 @@ store = store_start + store_end
 print("Detected store: %s" % (store))
 sys.stdout.flush()
 dir_path = os.path.dirname(os.path.realpath(__file__))
-announcements_path = os.path.join(dir_path, os.path.join('announce', country))
+announcements_lang_path = os.path.join(dir_path, os.path.join('announce', country))
+announcements_date_path = os.path.join(dir_path, os.path.join('announce', 'date'))
 alt_music_list_path = os.path.join(dir_path, 'alt_music_list.txt')
 
 def main():
@@ -57,10 +59,12 @@ def main():
         sys.stdout.flush()
         print("Checking for announcements...")
         sys.stdout.flush()
-        if os.path.exists(announcements_path):
-            announcements = [f for f in os.listdir(announcements_path) if not f.startswith('.') and os.path.isfile(os.path.join(announcements_path, f))]
-        else:
-            announcements = []
+        announcements = []
+        if os.path.exists(announcements_lang_path):
+            announcements = [os.path.join(announcements_lang_path, f) for f in os.listdir(announcements_lang_path) if not f.startswith('.') and os.path.isfile(os.path.join(announcements_lang_path, f))]
+        announcements_date_file = "%s.mp3" % datetime.today().strftime('%Y-%m-%d')
+        if country == 'sweden' and os.path.exists(announcements_date_path) and os.path.isfile(os.path.join(announcements_date_path, announcements_date_file)):
+            announcements.append(os.path.join(announcements_date_path, announcements_date_file))
         if announcements:
             print("Announcements found for %s" % country)
             sys.stdout.flush()
@@ -76,9 +80,13 @@ def main():
                             raise Exception("No internet connected. Restarting")
                         sleep(1)
                     player.pause()
-                    player_announce = Player(os.path.join(announcements_path, announce))
+                    player_announce = Player(announce)
                     sleep(1)
-                    duration = int(math.ceil(player_announce.length)) - 1
+                    duration = int(math.ceil(player_announce.length))
+                    if (duration > 30):
+                        duration -= 27
+                    else:
+                        duration -= 1
                     sleep(duration)
                     player_announce.quit()
                     player.pause()
