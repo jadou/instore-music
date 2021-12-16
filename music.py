@@ -26,7 +26,7 @@ print("Detected store: %s" % (store))
 sys.stdout.flush()
 dir_path = os.path.dirname(os.path.realpath(__file__))
 announcements_lang_path = os.path.join(dir_path, os.path.join('announce', country))
-announcements_date_path = os.path.join(dir_path, os.path.join('announce', 'date'))
+# announcements_date_path = os.path.join(dir_path, os.path.join('announce', 'date'))
 alt_music_list_path = os.path.join(dir_path, 'alt_music_list.txt')
 
 def main():
@@ -62,9 +62,9 @@ def main():
         announcements = []
         if os.path.exists(announcements_lang_path):
             announcements = [os.path.join(announcements_lang_path, f) for f in os.listdir(announcements_lang_path) if not f.startswith('.') and os.path.isfile(os.path.join(announcements_lang_path, f))]
-        announcements_date_file = "%s.mp3" % datetime.today().strftime('%Y-%m-%d')
-        if country == 'sweden' and os.path.exists(announcements_date_path) and os.path.isfile(os.path.join(announcements_date_path, announcements_date_file)):
-            announcements.append(os.path.join(announcements_date_path, announcements_date_file))
+        # announcements_date_file = "%s.mp3" % datetime.today().strftime('%Y-%m-%d')
+        # if country == 'sweden' and os.path.exists(announcements_date_path) and os.path.isfile(os.path.join(announcements_date_path, announcements_date_file)):
+        #     announcements.append(os.path.join(announcements_date_path, announcements_date_file))
         if announcements:
             print("Announcements found for %s" % country)
             sys.stdout.flush()
